@@ -1,4 +1,4 @@
-'use strict';
+ 'use strict';
 
 var Promise = require('bluebird'),
     async = require('async'),
@@ -36,7 +36,7 @@ function problemA () {
    */
 
   // callback version
-  async.each(['poem-two/stanza-01.txt', 'poem-two/stanza-02.txt'],
+  /* async.each(['poem-two/stanza-01.txt', 'poem-two/stanza-02.txt'],
     function (filename, eachDone) {
       readFile(filename, function (err, stanza) {
         console.log('-- A. callback version --');
@@ -47,10 +47,15 @@ function problemA () {
     function (err) {
       console.log('-- A. callback version done --');
     }
-  );
+  ); */
 
   // promise version
   // ???
+  const p1 = promisifiedReadFile('poem-two/stanza-01.txt').then(stanza=>{blue(stanza)})
+  const p2 = promisifiedReadFile("poem-two/stanza-02.txt").then(stanza=>{blue(stanza)})
+
+  Promise.all([p1,p2])
+  .then(()=>{console.log("done")})
 
 }
 
@@ -69,7 +74,7 @@ function problemB () {
   });
 
   // callback version
-  async.each(filenames,
+  /* async.each(filenames,
     function (filename, eachDone) {
       readFile(filename, function (err, stanza) {
         console.log('-- B. callback version --');
@@ -81,10 +86,12 @@ function problemB () {
       console.log('-- B. callback version done --');
     }
   );
-
+ */
   // promise version
-  // ???
+ const promises =  filenames.map(filename =>promisifiedReadFile(filename).then(s=>blue(s)))
 
+ Promise.all(promises)
+ .then(()=>{console.log("done")})
 }
 
 function problemC () {
@@ -103,7 +110,7 @@ function problemC () {
   });
 
   // callback version
-  async.eachSeries(filenames,
+  /* async.eachSeries(filenames,
     function (filename, eachDone) {
       readFile(filename, function (err, stanza) {
         console.log('-- C. callback version --');
@@ -114,10 +121,13 @@ function problemC () {
     function (err) {
       console.log('-- C. callback version done --');
     }
-  );
+  ); */
 
   // promise version
-  // ???
+  Promise.each(filenames, function(file){
+    return promisifiedReadFile(file).then(stanza => blue(stanza))
+  })
+  .then(() => console.log("done"))
 
 }
 
@@ -139,7 +149,7 @@ function problemD () {
   filenames[randIdx] = 'wrong-file-name-' + (randIdx + 1) + '.txt';
 
   // callback version
-  async.eachSeries(filenames,
+/*   async.eachSeries(filenames,
     function (filename, eachDone) {
       readFile(filename, function (err, stanza) {
         console.log('-- D. callback version --');
@@ -152,10 +162,18 @@ function problemD () {
       if (err) magenta(new Error(err));
       console.log('-- D. callback version done --');
     }
-  );
+  ); */
 
   // promise version
   // ???
+  Promise.each(filenames, function(file){
+    return promisifiedReadFile(file).then(stanza => blue(stanza))
+  })
+  .then(() => console.log("done"))
+  .catch(err=>{
+    magenta(new Error(err))
+    console.log("done")
+  })
 
 }
 
@@ -168,6 +186,14 @@ function problemE () {
 
   var fs = require('fs');
   function promisifiedWriteFile (filename, str) {
-    // tu código aquí
+    return new Promise((resolve,reject)=>{
+      fs.writeFile(filename,str,"utf-8",function(err,data){
+          if(err)return reject(err)
+          resolve(data)
+      })
+    })
+    promisifiedReadFile("./ubicaciondelarchivo","hdhhshhs")
+    .then(data=>console.log("se escribio okk",data))
+    .catch(err=>console.log("hay error", err))
   }
 }

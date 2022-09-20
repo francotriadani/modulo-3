@@ -23,7 +23,7 @@ http.createServer((req, res)=>{
 
 /* dejamos comentado porque no es escalable, necesitariamos hacer uno de estos por cada imagen
  y se haria eterno 
- por ende haruamos un codigo asi*/
+ por ende haruamos un codigo asi       */
 
 fs.readFile(`./images${req.url}.jpg`, (err,data)=>{/* de esta forma,paramos req url como data para la busqueda */
     if(err){

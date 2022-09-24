@@ -22,3 +22,57 @@ var beatles=[{
   profilePic:"http://cp91279.biography.com/BIO_Bio-Shorts_0_Ringo-Starr_SF_HD_768x432-16x9.jpg"
 }
 ]
+http.createServer((req, res)=>{
+  if(req.url === "/api"){
+    res.writeHead(200, {"content-Type":"application/json"})
+    return res.end(JSON.stringify(beatles))
+  }
+
+  if(req.url.substring(0,5) === "/api/"){
+    const beatle = req.url.split("/").pop()
+
+    const found = beatles.find(el => encodeURI(el.name).toLowerCase() === beatle.toLowerCase())
+
+    if(found){
+      res.writeHead(200, {"content-Type":"application/json"})
+      return res.end(JSON.stringify(found))
+    }else{
+      res.writeHead(400, {"content-Type":"text/plain"})
+      return res.end(`${beatle} not found`/*"beatle no encontrado"*/)
+    }
+  }
+
+  if(req.url === "/"){
+    fs.readFile("./index.html",(err,data)=>{
+      if(err){
+        res.writeHead(400, {"content-Type":"text/plain"})
+        return res.end(`nothing to show`)
+      }else{
+        res.writeHead(200, {"content-Type":"text/html"})
+        return res.end(data)
+      }
+    })
+  }
+if(req.url.length > 1){
+  const beatle = req.url.split("/").pop()
+  const found = beatles.find(el => encodeURI((el.name).toLowerCase() === beatle.toLowerCase()))
+
+  if(found){
+    fs.readFile("./beatle.html","utf-8",function(err,data){
+      if(err){
+        res.writeHead(400, {"content-Type":"text/plain"})
+        return res.end(`ningun beatle encontrado`)
+      }
+      data = data.replace("{name}", found.name)
+      data = data.replace("{birthdate}", found.birthdate)
+      data = data.replace("{profilePic}", found.profilePic)
+      res.writeHead(200, {"content-Type":"text/html"})
+      return res.end(data)
+    })
+  }else{
+    res.writeHead(400, {"content-Type":"text/plain"})
+    return res.end(`ningun beatle encontrado en general`)
+  }
+}
+
+}).listen(3001, ()=> console.log("runnung on port 3001"))
